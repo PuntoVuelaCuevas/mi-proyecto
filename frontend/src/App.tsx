@@ -67,7 +67,9 @@ const App = () => {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
 
   const predefinedLocations: Location[] = [
-    { id: 'loc1', name: 'Punto Vuela', lat: 36.87617075381733, lng: -5.045460278303508, icon: '🏢', color: 'blue' }
+    { id: 'loc1', name: 'Punto Vuela', lat: 37.2965, lng: -1.8687, icon: '🏢', color: 'blue' },
+    { id: 'loc2', name: 'Centro Cultural Rafael Alberti', lat: 37.2970, lng: -1.8690, icon: '🎭', color: 'purple' },
+    { id: 'loc3', name: 'El Nacimiento', lat: 37.2980, lng: -1.8680, icon: '🏞️', color: 'green' }
   ];
 
   const helpCategories = [
