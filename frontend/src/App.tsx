@@ -303,6 +303,20 @@ const App = () => {
     }
   };
 
+  const switchRole = () => {
+    if (userProfile) {
+      setTempUserId(userProfile.id);
+      setRegisterForm({
+        nombre_completo: userProfile.name,
+        email: userProfile.email,
+        password: '',
+        edad: userProfile.age,
+        genero: userProfile.gender
+      });
+      setAuthStep('selectRole');
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('userProfile');
     setUserProfile(null);
@@ -564,7 +578,15 @@ const App = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
         <div className="max-w-4xl mx-auto">
           {/* Header con botón de logout */}
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-end items-center mb-6 gap-4">
+            <button
+              onClick={switchRole}
+              className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+            >
+              <Users className="w-4 h-4" />
+              Cambiar Rol
+            </button>
+
             <button
               onClick={logout}
               className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-all"
@@ -712,7 +734,15 @@ const App = () => {
       <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-50 p-4">
         <div className="max-w-4xl mx-auto">
           {/* Header con botón de logout */}
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-end items-center mb-6 gap-4">
+            <button
+              onClick={switchRole}
+              className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+            >
+              <Users className="w-4 h-4" />
+              Cambiar Rol
+            </button>
+
             <button
               onClick={logout}
               className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-all"
