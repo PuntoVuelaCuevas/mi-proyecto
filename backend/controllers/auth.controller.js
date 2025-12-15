@@ -51,7 +51,7 @@ exports.register = async (req, res) => {
         const verification_token = crypto.randomBytes(32).toString('hex');
 
         // Crear usuario
-        const usuario = await Usuario.create({
+        const nuevoUsuario = await Usuario.create({
             nombre_usuario,
             email,
             password_hash,
@@ -65,17 +65,17 @@ exports.register = async (req, res) => {
         });
 
         // Enviar correo de verificación (sin esperar await para no bloquear)
-        sendVerificationEmail(usuario, verification_token);
+        sendVerificationEmail(nuevoUsuario, verification_token);
 
         // Responder
         res.status(201).json({
-            id: usuario.id,
-            nombre_usuario: usuario.nombre_usuario,
-            email: usuario.email,
-            nombre_completo: usuario.nombre_completo,
-            edad: usuario.edad,
-            genero: usuario.genero,
-            rol_activo: usuario.rol_activo,
+            id: nuevoUsuario.id,
+            nombre_usuario: nuevoUsuario.nombre_usuario,
+            email: nuevoUsuario.email,
+            nombre_completo: nuevoUsuario.nombre_completo,
+            edad: nuevoUsuario.edad,
+            genero: nuevoUsuario.genero,
+            rol_activo: nuevoUsuario.rol_activo,
             message: 'Usuario registrado. Por favor verifica tu correo.'
         });
     } catch (error) {
