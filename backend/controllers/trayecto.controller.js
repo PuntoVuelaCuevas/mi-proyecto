@@ -1,10 +1,26 @@
 const { Trayecto, Usuario } = require('../models');
+const { sendNewRequestNotification } = require('../config/mailer');
 
 exports.createTrayecto = async (req, res) => {
     try {
         console.log('Creating trayecto with data:', req.body);
         const trayecto = await Trayecto.create(req.body);
         console.log('Trayecto created successfully:', trayecto.id);
+
+        // Enviar notificación por correo
+        try {
+            const users = await Usuario.findAll({ attributes: ['email'] });
+            const recipients = users.map(u => u.email).filter(email => email); // Array de emails
+
+            if (recipients.length > 0) {
+                console.log(`Sending notification to ${recipients.length} users`);
+                // Enviamos sin await para no bloquear la respuesta HTTP
+                sendNewRequestNotification(trayecto, recipients);
+            }
+        } catch (emailError) {
+            console.error('Error fetching users for notification:', emailError);
+        }
+
         res.status(201).json(trayecto);
     } catch (error) {
         console.error('ERROR CREATING TRAYECTO - Full error:');
