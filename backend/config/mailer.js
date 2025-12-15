@@ -49,4 +49,39 @@ const sendNewRequestNotification = async (trayecto, recipients) => {
     }
 };
 
-module.exports = { sendNewRequestNotification };
+const sendVerificationEmail = async (user, token) => {
+    try {
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            console.warn('Email credentials not found. Skipping verification email.');
+            return;
+        }
+
+        const verificationLink = `https://backend-voluntariosapp.onrender.com/api/v1/auth/verify/${token}`;
+
+        const mailOptions = {
+            from: `"Voluntarios Punto Vuela" <${process.env.EMAIL_USER}>`,
+            to: user.email,
+            subject: `Verifica tu cuenta en Voluntarios Punto Vuela`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #2563eb;">¡Bienvenido/a, ${user.nombre_completo}!</h2>
+                    <p>Gracias por registrarte. Para comenzar a usar tu cuenta, por favor verifica tu correo electrónico.</p>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${verificationLink}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Verificar mi Correo</a>
+                    </div>
+
+                    <p style="font-size: 12px; color: #666;">Si no has creado esta cuenta, puedes ignorar este correo.</p>
+                </div>
+            `
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Verification email sent:', info.messageId);
+        return info;
+    } catch (error) {
+        console.error('Error sending verification email:', error);
+    }
+};
+
+module.exports = { sendNewRequestNotification, sendVerificationEmail };

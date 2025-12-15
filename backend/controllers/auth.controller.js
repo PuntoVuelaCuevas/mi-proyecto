@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const { Usuario } = require('../models');
+const { sendVerificationEmail } = require('../config/mailer');
 
 // Registrar nuevo usuario
 exports.register = async (req, res) => {
@@ -27,6 +29,9 @@ exports.register = async (req, res) => {
         // Hash de la contraseña
         const password_hash = await bcrypt.hash(password, 10);
 
+        // Generar token de verificación
+        const verification_token = crypto.randomBytes(32).toString('hex');
+
         // Crear usuario
         const usuario = await Usuario.create({
             nombre_usuario,
@@ -36,10 +41,15 @@ exports.register = async (req, res) => {
             edad: edad || null,
             genero: genero || null,
             es_voluntario: false,
-            rol_activo: null
+            rol_activo: null,
+            email_verified: false,
+            verification_token
         });
 
-        // Responder sin enviar el password_hash
+        // Enviar correo de verificación (sin esperar await para no bloquear)
+        sendVerificationEmail(usuario, verification_token);
+
+        // Responder
         res.status(201).json({
             id: usuario.id,
             nombre_usuario: usuario.nombre_usuario,
@@ -47,7 +57,8 @@ exports.register = async (req, res) => {
             nombre_completo: usuario.nombre_completo,
             edad: usuario.edad,
             genero: usuario.genero,
-            rol_activo: usuario.rol_activo
+            rol_activo: usuario.rol_activo,
+            message: 'Usuario registrado. Por favor verifica tu correo.'
         });
     } catch (error) {
         console.error('Error in register:', error);
@@ -55,6 +66,29 @@ exports.register = async (req, res) => {
             message: 'Error al registrar usuario',
             error: error.message
         });
+    }
+};
+
+// Verificar Email
+exports.verifyEmail = async (req, res) => {
+    try {
+        const { token } = req.params;
+
+        const usuario = await Usuario.findOne({ where: { verification_token: token } });
+
+        if (!usuario) {
+            return res.status(400).send('<h1>Link de verificación inválido o expirado.</h1>');
+        }
+
+        usuario.email_verified = true;
+        usuario.verification_token = null; // Invalidar token
+        await usuario.save();
+
+        // Redirigir al frontend (login)
+        res.redirect('https://mi-proyecto-pearl.vercel.app/');
+    } catch (error) {
+        console.error('Error verifying email:', error);
+        res.status(500).send('<h1>Error al verificar el correo.</h1>');
     }
 };
 
@@ -83,6 +117,13 @@ exports.login = async (req, res) => {
         if (!isValidPassword) {
             return res.status(401).json({
                 message: 'Email o contraseña incorrectos'
+            });
+        }
+
+        // Verificar si el email está validado
+        if (!usuario.email_verified) {
+            return res.status(403).json({
+                message: 'Por favor verifica tu correo antes de iniciar sesión.'
             });
         }
 

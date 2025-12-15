@@ -54,6 +54,14 @@ const Usuario = sequelize.define('Usuario', {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW
+    },
+    email_verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    verification_token: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     tableName: 'usuario',
