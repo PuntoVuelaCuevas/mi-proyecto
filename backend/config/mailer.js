@@ -12,8 +12,8 @@ const transporter = nodemailer.createTransport({
     // Opciones para evitar timeouts en Render
     logger: true,
     debug: true,
-    connectionTimeout: 10000,
-    socketTimeout: 10000,
+    connectionTimeout: 60000, // 60 segundos
+    socketTimeout: 60000,
     // Forzar IPv4 (clave para arreglar bloqueos en Render)
     ignoreTLS: false,
     requireTLS: true,
